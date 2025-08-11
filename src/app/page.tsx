@@ -33,6 +33,7 @@ function TokenStyles({ tokens = TOKENS }: { tokens?: typeof TOKENS }) {
   return <style>{css}</style>;
 }
 
+
 // A lightweight, single-file dummy site we can iterate on quickly.
 // Structure: Navbar → Hero → Thesis → Events → Newsletter → CTA → Footer
 

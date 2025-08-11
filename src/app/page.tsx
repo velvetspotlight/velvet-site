@@ -22,7 +22,7 @@ const TOKENS = {
 };
 
 function TokenStyles({ tokens = TOKENS }) {
-  const css = `:root{--bg:${TOKENS.colors.bg};--text:${TOKENS.colors.text};--accent:${TOKENS.colors.accent};--accent2:${TOKENS.colors.accent2};--accent3:${TOKENS.colors.accent3};--surface:${TOKENS.colors.surface};--surface-strong:${TOKENS.colors.surfaceStrong};--border:${TOKENS.colors.border};--radius-xl:${TOKENS.radius.xl};--radius-xxl:${TOKENS.radius.xxl};--font-display:${TOKENS.fonts.display};--font-body:${TOKENS.fonts.body};}
+  const css = `:root{--bg:${tokens.colors.bg};--text:${tokens.colors.text};--accent:${tokens.colors.accent};--accent2:${tokens.colors.accent2};--accent3:${tokens.colors.accent3};--surface:${tokens.colors.surface};--surface-strong:${tokens.colors.surfaceStrong};--border:${tokens.colors.border};--radius-xl:${tokens.radius.xl};--radius-xxl:${tokens.radius.xxl};--font-display:${tokens.fonts.display};--font-body:${tokens.fonts.body};}
   @media (min-width:640px){:root{--fluid-h1:clamp(2.5rem,4vw+1rem,3.75rem);--fluid-h2:clamp(1.5rem,2.2vw+0.5rem,2rem);} }
   body{font-family:var(--font-body)}
   .display{font-family:var(--font-display)}
@@ -310,13 +310,15 @@ function GradientText({ children }) {
   );
 }
 
-function Social({ label, href }) {
+function Social(
+  { label, href, dot = false }: { label: string; href: string; dot?: boolean }
+) {
   return (
     <a
       href={href}
       aria-label={label}
       className="group relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-      <span className="h-1.5 w-1.5 rounded-full bg-white/50 group-hover:bg-white" />
+      {dot && <span className="h-1.5 w-1.5 rounded-full bg-white/50 group-hover:bg-white" />}
       <span className="text-xs opacity-80 group-hover:opacity-100">{label}</span>
     </a>
   );
@@ -360,4 +362,3 @@ function AuroraCanvas() {
     </motion.div>
   );
 }
-

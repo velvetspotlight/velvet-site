@@ -8,9 +8,9 @@ const TOKENS = {
   colors: {
     bg: "#0a0a0a",
     text: "#ffffff",
-    accent: "#E879F9",   // fuchsia-400 (placeholder)
-    accent2: "#818CF8",  // indigo-400 (placeholder)
-    accent3: "#38BDF8",  // sky-400 (placeholder)
+    accent: "#E879F9", // fuchsia-400 (placeholder)
+    accent2: "#818CF8", // indigo-400 (placeholder)
+    accent3: "#38BDF8", // sky-400 (placeholder)
     surface: "rgba(255,255,255,0.05)",
     surfaceStrong: "rgba(255,255,255,0.08)",
     border: "rgba(255,255,255,0.10)",
@@ -33,14 +33,45 @@ function TokenStyles({ tokens = TOKENS }: { tokens?: typeof TOKENS }) {
   return <style>{css}</style>;
 }
 
+// ——— Horizontal scroll utilities ———
+function useHorizontalNav() {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = containerRef.current;
+    if (!el) return;
+    // Convert vertical wheel to horizontal motion for mouse wheels
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    }
+  };
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  };
+
+  return { containerRef, onWheel, scrollTo };
+}
+
+function Panel({ id, children }: { id: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className="snap-start shrink-0 w-screen min-h-screen">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
+    </section>
+  );
+}
 
 // A lightweight, single-file dummy site we can iterate on quickly.
-// Structure: Navbar → Hero → Thesis → Events → Newsletter → CTA → Footer
-
+// Structure: Navbar → Horizontal panels (Hero • Thesis • Events • Newsletter • CTA) → Footer
 export default function VelvetDummySite() {
+  const { containerRef, onWheel, scrollTo } = useHorizontalNav();
+
   return (
     <div className="min-h-screen bg-black text-white selection:bg-fuchsia-500/30 selection:text-fuchsia-200">
       <TokenStyles />
+
       {/* Background aura */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
         <motion.div
@@ -61,20 +92,37 @@ export default function VelvetDummySite() {
         />
       </div>
 
-      <SiteNav />
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Hero />
-        <Thesis />
-        <EventsPreview />
-        <Newsletter />
-        <DualCTA />
-      </main>
+      <SiteNav onNav={scrollTo} />
+
+      {/* Horizontal scroller */}
+      <div
+        ref={containerRef}
+        onWheel={onWheel}
+        className="h-screen w-screen overflow-x-auto overflow-y-hidden snap-x snap-mandatory flex"
+      >
+        <Panel id="home">
+          <Hero />
+        </Panel>
+        <Panel id="thesis">
+          <Thesis />
+        </Panel>
+        <Panel id="events">
+          <EventsPreview />
+        </Panel>
+        <Panel id="newsletter">
+          <Newsletter />
+        </Panel>
+        <Panel id="tickets">
+          <DualCTA />
+        </Panel>
+      </div>
+
       <SiteFooter />
     </div>
   );
 }
 
-function SiteNav() {
+function SiteNav({ onNav }: { onNav?: (id: string) => void }) {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-sm bg-black/40 border-b border-white/10">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
@@ -82,25 +130,25 @@ function SiteNav() {
           VELVET
         </a>
         <div className="hidden md:flex items-center gap-6 text-sm">
-          <a className="opacity-80 hover:opacity-100" href="#events">
+          <button className="opacity-80 hover:opacity-100" onClick={() => onNav?.("events")}>
             Events
-          </a>
-          <a className="opacity-80 hover:opacity-100" href="#thesis">
+          </button>
+          <button className="opacity-80 hover:opacity-100" onClick={() => onNav?.("thesis")}>
             About
-          </a>
-          <a className="opacity-80 hover:opacity-100" href="#invest">
+          </button>
+          <button className="opacity-80 hover:opacity-100" onClick={() => onNav?.("invest")}>
             Invest
-          </a>
-          <a className="opacity-80 hover:opacity-100" href="#sponsor">
+          </button>
+          <button className="opacity-80 hover:opacity-100" onClick={() => onNav?.("sponsor")}>
             Sponsor
-          </a>
+          </button>
         </div>
-        <a
-          href="#tickets"
+        <button
+          onClick={() => onNav?.("tickets")}
           className="inline-flex items-center rounded-2xl border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition"
         >
           Buy Tickets
-        </a>
+        </button>
       </nav>
     </header>
   );
@@ -127,9 +175,7 @@ function Hero() {
             transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
             className="mt-5 max-w-xl text-base sm:text-lg opacity-80"
           >
-            Velvet hosts sensory-forward shows for rising artists — and we’re
-            designing a permanent venue that doubles as a third space to create,
-            work, and hang.
+            Velvet hosts sensory-forward shows for rising artists — and we’re designing a permanent venue that doubles as a third space to create, work, and hang.
           </motion.p>
 
           <motion.div
@@ -138,7 +184,10 @@ function Hero() {
             transition={{ delay: 0.2 }}
             className="mt-8 flex flex-wrap gap-3"
           >
-            <a className="rounded-2xl bg-white text-black px-5 py-3 text-sm font-medium shadow-[0_0_0_1px_rgba(255,255,255,0.12)] hover:shadow-[0_0_0_2px_rgba(255,255,255,0.25)] transition" href="#tickets">
+            <a
+              className="rounded-2xl bg-white text-black px-5 py-3 text-sm font-medium shadow-[0_0_0_1px_rgba(255,255,255,0.12)] hover:shadow-[0_0_0_2px_rgba(255,255,255,0.25)] transition"
+              href="#tickets"
+            >
               Get Tickets
             </a>
             <a
@@ -155,7 +204,6 @@ function Hero() {
               <Social label="Instagram" href="#" />
               <Social label="TikTok" href="#" />
               <Social label="X" href="#" />
-
             </div>
           </div>
         </div>
@@ -191,9 +239,7 @@ function Thesis() {
             The future of art is multisensory
           </SectionHeading>
           <p className="mt-4 max-w-2xl text-base sm:text-lg opacity-80">
-            We curate stages where sound, light, and space collaborate. As we
-            grow, we’re securing a permanent venue engineered for immersion — by
-            day, a creative third place; by night, a theater for new voices.
+            We curate stages where sound, light, and space collaborate. As we grow, we’re securing a permanent venue engineered for immersion — by day, a creative third place; by night, a theater for new voices.
           </p>
         </div>
         <div className="rounded-3xl border border-white/10 p-6 bg-white/5">
@@ -211,11 +257,7 @@ function Thesis() {
 
 function EventsPreview() {
   const events = [
-    {
-      date: "Sep 12",
-      title: "NEON BLOOM: emerging painters × live synths",
-      tag: "Tickets soon",
-    },
+    { date: "Sep 12", title: "NEON BLOOM: emerging painters × live synths", tag: "Tickets soon" },
     { date: "Oct 03", title: "SENSORIUM: dance in 360°", tag: "On sale" },
     { date: "Oct 24", title: "HUSH//ECHO: ambient night", tag: "Waitlist" },
   ];
@@ -232,9 +274,7 @@ function EventsPreview() {
           >
             <div className="flex items-center justify-between text-xs opacity-80">
               <span>{e.date}</span>
-              <span className="rounded-full border border-white/15 px-2 py-0.5 text-[11px] opacity-80 group-hover:opacity-100">
-                {e.tag}
-              </span>
+              <span className="rounded-full border border-white/15 px-2 py-0.5 text-[11px] opacity-80 group-hover:opacity-100">{e.tag}</span>
             </div>
             <h3 className="mt-3 text-lg font-medium group-hover:opacity-100 opacity-90">
               {e.title}
@@ -253,12 +293,9 @@ function Newsletter() {
   return (
     <section id="newsletter" className="py-14 sm:py-24">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-10">
-        <SectionHeading kicker="Stay in the loop">
-          Join the newsletter
-        </SectionHeading>
+        <SectionHeading kicker="Stay in the loop">Join the newsletter</SectionHeading>
         <p className="mt-3 max-w-2xl text-sm sm:text-base opacity-80">
-          Monthly highlights: early ticket drops, artist spotlights,
-          behind-the-scenes build of our permanent venue.
+          Monthly highlights: early ticket drops, artist spotlights, behind-the-scenes build of our permanent venue.
         </p>
         <form className="mt-6 flex flex-col gap-3 sm:flex-row">
           <input
@@ -283,50 +320,25 @@ function DualCTA() {
   return (
     <section id="tickets" className="py-14 sm:py-24">
       <div className="grid gap-6 lg:grid-cols-2">
-        <div
-          id="invest"
-          className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10"
-        >
-          <SectionHeading kicker="Back the vision">
-            Invest in Velvet
-          </SectionHeading>
+        <div id="invest" className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10">
+          <SectionHeading kicker="Back the vision">Invest in Velvet</SectionHeading>
           <p className="mt-3 max-w-xl text-sm sm:text-base opacity-80">
-            We’re raising to build a first-of-its-kind immersive venue. If
-            you’re an investor exploring culture-tech, we’d love to talk.
+            We’re raising to build a first-of-its-kind immersive venue. If you’re an investor exploring culture-tech, we’d love to talk.
           </p>
           <div className="mt-6">
-            <a
-              href="#"
-              className="inline-flex items-center rounded-2xl border border-white/20 px-5 py-3 text-sm hover:bg-white/10 transition"
-            >
+            <a href="#" className="inline-flex items-center rounded-2xl border border-white/20 px-5 py-3 text-sm hover:bg-white/10 transition">
               View the Deck
             </a>
           </div>
         </div>
-        <div
-          id="sponsor"
-          className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10"
-        >
-          <SectionHeading kicker="Partner with us">
-            Sponsor an event
-          </SectionHeading>
+        <div id="sponsor" className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10">
+          <SectionHeading kicker="Partner with us">Sponsor an event</SectionHeading>
           <p className="mt-3 max-w-xl text-sm sm:text-base opacity-80">
-            Align your brand with emerging art and design. Custom integrations,
-            on-site experiences, and content collabs.
+            Align your brand with emerging art and design. Custom integrations, on-site experiences, and content collabs.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a
-              href="#"
-              className="rounded-2xl bg-white text-black px-5 py-3 text-sm font-medium"
-            >
-              Start a Conversation
-            </a>
-            <a
-              href="#"
-              className="rounded-2xl border border-white/20 px-5 py-3 text-sm hover:bg-white/10 transition"
-            >
-              See Sponsor Kit
-            </a>
+            <a href="#" className="rounded-2xl bg-white text-black px-5 py-3 text-sm font-medium">Start a Conversation</a>
+            <a href="#" className="rounded-2xl border border-white/20 px-5 py-3 text-sm hover:bg-white/10 transition">See Sponsor Kit</a>
           </div>
         </div>
       </div>
@@ -341,20 +353,12 @@ function SiteFooter() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <span className="font-semibold tracking-wide">VELVET</span>
-            <p className="mt-2 text-xs opacity-60">
-              © {new Date().getFullYear()} Velvet — All rights reserved.
-            </p>
+            <p className="mt-2 text-xs opacity-60">© {new Date().getFullYear()} Velvet — All rights reserved.</p>
           </div>
           <div className="flex gap-4 text-xs opacity-70">
-            <a href="#" className="hover:opacity-100">
-              Terms
-            </a>
-            <a href="#" className="hover:opacity-100">
-              Privacy
-            </a>
-            <a href="#" className="hover:opacity-100">
-              Contact
-            </a>
+            <a href="#" className="hover:opacity-100">Terms</a>
+            <a href="#" className="hover:opacity-100">Privacy</a>
+            <a href="#" className="hover:opacity-100">Contact</a>
           </div>
         </div>
       </div>
@@ -363,13 +367,7 @@ function SiteFooter() {
 }
 
 /* ——— UI bits ——— */
-function SectionHeading({
-  children,
-  kicker,
-}: {
-  children: React.ReactNode;
-  kicker?: string;
-}) {
+function SectionHeading({ children, kicker }: { children: React.ReactNode; kicker?: string }) {
   return (
     <div>
       {kicker && (
@@ -391,24 +389,13 @@ function GradientText({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Social({
-  label,
-  href,
-  dot = false,
-}: {
-  label: string;
-  href: string;
-  dot?: boolean;
-}) {
+function Social({ label, href }: { label: string; href: string }) {
   return (
     <a
       href={href}
       aria-label={label}
       className="group relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5"
     >
-      {dot && (
-        <span className="h-1.5 w-1.5 rounded-full bg-white/50 group-hover:bg-white" />
-      )}
       <span className="text-xs opacity-80 group-hover:opacity-100">{label}</span>
     </a>
   );

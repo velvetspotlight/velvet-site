@@ -317,7 +317,8 @@ function Social(
     <a
       href={href}
       aria-label={label}
-      className="group relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+      className="group relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5"
+    >
       {dot && <span className="h-1.5 w-1.5 rounded-full bg-white/50 group-hover:bg-white" />}
       <span className="text-xs opacity-80 group-hover:opacity-100">{label}</span>
     </a>

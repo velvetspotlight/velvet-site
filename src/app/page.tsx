@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
-// ——— Design tokens
+/* ---------------- Design tokens ---------------- */
 const TOKENS = {
   colors: {
     bg: "#0a0a0a",
@@ -32,7 +32,7 @@ function TokenStyles({ tokens = TOKENS }: { tokens?: typeof TOKENS }) {
   return <style>{css}</style>;
 }
 
-/* ---------- Horizontal scaffolding ---------- */
+/* --------------- Horizontal scaffolding --------------- */
 function Panel({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <section
@@ -50,13 +50,12 @@ function Panel({ id, children }: { id: string; children: React.ReactNode }) {
 function HorizontalScroller({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Translate vertical wheel to horizontal scroll
+  // Translate vertical mouse wheel into horizontal scroll
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
-      // if vertical intent is stronger than horizontal, hijack it
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
         el.scrollLeft += e.deltaY;
@@ -64,7 +63,7 @@ function HorizontalScroller({ children }: { children: React.ReactNode }) {
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel as any);
+    return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
   return (
@@ -77,7 +76,7 @@ function HorizontalScroller({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ---------- Page ---------- */
+/* -------------------- Page -------------------- */
 export default function VelvetDummySite() {
   return (
     <div className="h-screen w-screen bg-black text-white selection:bg-fuchsia-500/30 selection:text-fuchsia-200">
@@ -108,7 +107,7 @@ export default function VelvetDummySite() {
   );
 }
 
-/* ---------- UI Sections ---------- */
+/* ---------------- UI Sections ---------------- */
 function SiteNav() {
   const link = (id: string, label: string) => (
     <a
@@ -207,13 +206,26 @@ function Hero() {
           transition={{ delay: 0.2 }}
           className="mt-8 flex flex-wrap gap-3"
         >
-          <a className="rounded-2xl bg-white text-black px-5 py-3 text-sm font-medium shadow-[0_0_0_1px_rgba(255,255,255,0.12)] hover:shadow-[0_0_0_2px_rgba(255,255,255,0.25)] transition" href="#tickets"
-            onClick={(e) => { e.preventDefault(); document.getElementById("tickets")?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" }); }}>
+          <a
+            className="rounded-2xl bg-white text-black px-5 py-3 text-sm font-medium shadow-[0_0_0_1px_rgba(255,255,255,0.12)] hover:shadow-[0_0_0_2px_rgba(255,255,255,0.25)] transition"
+            href="#tickets"
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("tickets")
+                ?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+            }}
+          >
             Get Tickets
           </a>
           <a
             href="#newsletter"
-            onClick={(e) => { e.preventDefault(); document.getElementById("newsletter")?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" }); }}
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("newsletter")
+                ?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+            }}
             className="rounded-2xl border border-white/20 px-5 py-3 text-sm hover:bg-white/10 transition"
           >
             Join the Newsletter
@@ -289,7 +301,12 @@ function EventsPreview() {
           <motion.a
             key={i}
             href="#tickets"
-            onClick={(ev) => { ev.preventDefault(); document.getElementById("tickets")?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" }); }}
+            onClick={(ev) => {
+              ev.preventDefault();
+              document
+                .getElementById("tickets")
+                ?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+            }}
             whileHover={{ y: -4 }}
             className="group rounded-3xl border border-white/10 bg-white/5 p-5 transition"
           >
@@ -343,10 +360,7 @@ function Newsletter() {
 function DualCTA() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <div
-        id="invest"
-        className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10"
-      >
+      <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10">
         <SectionHeading kicker="Back the vision">
           Invest in Velvet
         </SectionHeading>
@@ -363,10 +377,7 @@ function DualCTA() {
           </a>
         </div>
       </div>
-      <div
-        id="sponsor"
-        className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10"
-      >
+      <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/0 p-6 sm:p-10">
         <SectionHeading kicker="Partner with us">
           Sponsor an event
         </SectionHeading>
@@ -415,3 +426,91 @@ function SiteFooter() {
   );
 }
 
+/* --------------- UI bits --------------- */
+function SectionHeading({
+  children,
+  kicker,
+}: {
+  children: React.ReactNode;
+  kicker?: string;
+}) {
+  return (
+    <div>
+      {kicker && (
+        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] tracking-wide uppercase opacity-90">
+          <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-400" />
+          {kicker}
+        </div>
+      )}
+      <h2 className="text-2xl sm:text-3xl font-semibold">{children}</h2>
+    </div>
+  );
+}
+
+function GradientText({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="bg-gradient-to-r from-fuchsia-400 via-indigo-300 to-sky-300 bg-clip-text text-transparent">
+      {children}
+    </span>
+  );
+}
+
+function Social({ label, href }: { label: string; href: string }) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      className="group relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5"
+    >
+      <span className="text-xs opacity-80 group-hover:opacity-100">{label}</span>
+    </a>
+  );
+}
+
+function CardBackdrop({ index }: { index: number }) {
+  const palettes = [
+    "linear-gradient(135deg, rgba(236,72,153,0.25), rgba(59,130,246,0.25))",
+    "linear-gradient(135deg, rgba(147,51,234,0.25), rgba(20,184,166,0.25))",
+    "linear-gradient(135deg, rgba(99,102,241,0.25), rgba(16,185,129,0.25))",
+  ];
+  return (
+    <motion.div
+      initial={{ scale: 1.02 }}
+      whileHover={{ scale: 1.05 }}
+      className="h-full w-full"
+      style={{ backgroundImage: palettes[index % palettes.length] }}
+    />
+  );
+}
+
+function AuroraCanvas() {
+  return (
+    <motion.div
+      role="img"
+      aria-label="Abstract aurora animation"
+      initial={{ opacity: 0.8 }}
+      animate={{ opacity: [0.7, 1, 0.7] }}
+      transition={{ duration: 8, repeat: Infinity }}
+      className="relative h-full w-full"
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 80% 20%, rgba(168,85,247,0.35), transparent 60%), radial-gradient(100% 60% at 20% 80%, rgba(59,130,246,0.3), transparent 60%), radial-gradient(80% 80% at 50% 50%, rgba(236,72,153,0.25), transparent 60%)",
+        }}
+      />
+      <motion.div
+        className="absolute inset-0"
+        initial={{ backgroundPosition: "0% 50%" }}
+        animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        style={{
+          backgroundImage:
+            "linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
+          backgroundSize: "8px 100%",
+        }}
+      />
+    </motion.div>
+  );
+}

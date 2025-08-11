@@ -152,9 +152,10 @@ function Hero() {
           <div className="mt-8 flex items-center gap-4 text-xs opacity-70">
             <span>Follow us</span>
             <div className="flex gap-3">
-              <Social dot label="Instagram" href="#" />
-              <Social dot label="TikTok" href="#" />
-              <Social dot label="X" href="#" />
+              <Social label="Instagram" href="#" />
+              <Social label="TikTok" href="#" />
+              <Social label="X" href="#" />
+
             </div>
           </div>
         </div>

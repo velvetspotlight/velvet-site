@@ -405,7 +405,13 @@ function SiteFooter() {
             </p>
           </div>
           <div className="flex gap-4 text-xs opacity-70">
-            <a href="#" className="hover:opacity-100">
-              Terms
-            </a>
-            <a href="#" className="hover:opa
+            <a href="#" className="hover:opacity-100">Terms</a>
+            <a href="#" className="hover:opacity-100">Privacy</a>
+            <a href="#" className="hover:opacity-100">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
